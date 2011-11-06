@@ -1,0 +1,33 @@
+#smp-pages {
+width: 650px;
+}
+
+div.page {
+  position:relative;
+
+}
+img.pageimg{
+  border: 1px solid #F0EB9E;
+  margin:5px;  
+}
+
+div.measure{
+  position: absolute;
+  background-color: #FF0000;
+  /* for IE */
+  filter:alpha(opacity=0);
+  /* CSS3 standard */
+  opacity:0;
+  /*display:none;*/
+  margin:5px;
+}
+
+div.measure-visible{
+  position: absolute;
+  background-color: #FF0000;
+  /* for IE */
+  filter:alpha(opacity=20);
+  /* CSS3 standard */
+  opacity:0.20;
+  /*display:none;*/
+}

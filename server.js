@@ -15,6 +15,11 @@ var bayeux = new faye.NodeAdapter({mount: '/faye', timeout: 45});
 // Web Server, Express ------------------------------------------
 var app = module.exports = express.createServer();
 
+var redisClient = redis.createClient();
+redisClient.on('error', function(err) {
+  console.log("Redis error: " + e.message);   
+});
+
 bayeux.attach(app);
 
 // Configuration
@@ -55,15 +60,16 @@ app.post('/create', function(req, res) {
 	      				path:scoreURL.pathname + scoreURL.search
 	      				};
 	      	http.get(options, function(resp) {
-	      		if(resp.statusCode == 200) {
+	      		if(resp.statusCode == 200) 
+	      		    var data = '';
 	      			resp.on('data', function(chunk) {   
-           				var score = JSON.parse(chunk); 
+	      				data += chunk;
+      				}).on('error', function(e) {  
+	      			console.log("Got error: " + e.message);   
+	 				});
+      				resp.on('end', function() {
+      				    var score = JSON.parse(data); 
            				console.log(score.id + ' - ' + score.secret);
-           				
-           				var redisClient = redis.createClient();
-           				redisClient.on('error', function(err) {
-           					console.log("Redis error: " + e.message);   
-           				});
            				
            				var scoreSave = {id:score.id, secret : score.secret};
            				redisClient.incr( 'next.session.id' , function (err, id) {
@@ -71,12 +77,9 @@ app.post('/create', function(req, res) {
            						var msg = 'You can go to your <a href="/session/'+id+'">sheet music session</a>';
            						res.send(msg);
            					});	
-           				});
+           				});	
       				});
-	      		}
-	      	}).on('error', function(e) {  
-	      			console.log("Got error: " + e.message);   
-	 		}); 
+	      		}); 
 	      }  
 	 }).on('error', function(e) {  
 	      console.log("Got error: " + e.message);   
@@ -86,10 +89,6 @@ app.post('/create', function(req, res) {
 app.get('/session/:sessionid', function(req, res, next){
 	var sessionId = req.params.sessionid;
 	console.log("sessionId " + sessionId);
-	var redisClient = redis.createClient();
-	redisClient.on('error', function(err) {
-		console.log("Redis error: " + e.message);   
-	});
 	redisClient.get('session:'+sessionId, function(err, data){
 		if(!data) {
 			res.writeHead(404);

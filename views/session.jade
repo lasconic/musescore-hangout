@@ -4,13 +4,13 @@ html
     title= title
     script(type='text/javascript', src='/javascripts/jquery-1.4.2.min.js')
     script(type='text/javascript', src='/javascripts/jquery.mpager.js')
-    script(type='text/javascript', src='http://localhost:8080/faye.js') 
+    script(type='text/javascript', src='http://musescore.no.de/faye.js') 
     //link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel='stylesheet', href='/stylesheets/smp.css')
     script
       var mpager;  
       $(document).ready(function() {
-        var client = new Faye.Client('http://localhost:8080/faye');
+        var client = new Faye.Client('http://musescore.no.de/faye');
         var subscription = client.subscribe('/#{sessionId}/*', function(message) {
           var measureNumber = message.mn;
           mpager.goTo(measureNumber-1);

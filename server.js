@@ -7,7 +7,8 @@ var express = require('express')
   , urlUtils = require('url')
   , http = require('http')
   , redis = require('redis')
-  , faye = require('faye');
+  , faye = require('faye')
+  , tools = require('./tools');
 
 
 var bayeux = new faye.NodeAdapter({mount: '/faye', timeout: 45});
@@ -65,16 +66,17 @@ app.post('/create', function(req, res) {
 	      			resp.on('data', function(chunk) {   
 	      				data += chunk;
       				}).on('error', function(e) {  
-	      			console.log("Got error: " + e.message);   
+	      			  console.log("Got error: " + e.message);   
 	 				});
       				resp.on('end', function() {
       				    var score = JSON.parse(data); 
-           				console.log(score.id + ' - ' + score.secret);
+           				console.log(score.id + ' - ' + score.secret + ' - ' + score.metadata.pages);
            				
-           				var scoreSave = {id:score.id, secret : score.secret};
+           				var scoreSave = {id:score.id, secret : score.secret, pageCount:score.metadata.pages};
            				redisClient.incr( 'next.session.id' , function (err, id) {
-           					redisClient.set('session:'+id, JSON.stringify(scoreSave), function() {
-           						var msg = 'You can go to your <a href="/session/'+id+'">sheet music session</a>';
+           					var sessionId = tools.randomString(5) + id;
+           					redisClient.set('session:'+sessionId, JSON.stringify(scoreSave), function() {
+           						var msg = 'You can go to your <a href="/session/' + sessionId + '">sheet music session</a>';
            						res.send(msg);
            					});	
            				});	
@@ -97,7 +99,12 @@ app.get('/session/:sessionid', function(req, res, next){
 			return;
 		}
 		var score = JSON.parse(data);
-		res.render('session.jade', {title:"Sheet music session", id:score.id, secret:score.secret, sessionId: sessionId, layout:false});	
+		res.render('session.jade', {title:"Sheet music session", 
+			id:score.id, 
+			secret:score.secret, 
+			pageCount: score.pageCount,
+			sessionId: sessionId, 
+			layout:false});	
 	});
 	
 });

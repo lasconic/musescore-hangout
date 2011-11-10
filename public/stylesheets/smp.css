@@ -1,14 +1,14 @@
 #smp-pages {
-width: 650px;
+width: 660px;
 }
 
 div.page {
   position:relative;
-
+  background-color: white;
 }
+
 img.pageimg{
-  border: 1px solid #F0EB9E;
-  margin:5px;  
+  border: 1px solid #F0EB9E; 
 }
 
 div.measure{
@@ -19,7 +19,6 @@ div.measure{
   /* CSS3 standard */
   opacity:0;
   /*display:none;*/
-  margin:5px;
 }
 
 div.measure-visible{

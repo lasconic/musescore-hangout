@@ -2,13 +2,14 @@
 width: 660px;
 }
 
-div.page {
+div.mpager-page {
   position:relative;
   background-color: white;
 }
 
 img.pageimg{
   border: 1px solid #F0EB9E; 
+  display: block;
 }
 
 div.measure{

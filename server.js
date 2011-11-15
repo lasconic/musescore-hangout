@@ -10,7 +10,7 @@ var express = require('express')
   , faye = require('faye')
   , tools = require('./tools');
 
-
+var hostname = 'musescore.no.de';
 var bayeux = new faye.NodeAdapter({mount: '/faye', timeout: 45});
 
 // Web Server, Express ------------------------------------------
@@ -34,11 +34,13 @@ app.configure(function(){
 });
 
 app.configure('development', function(){
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+  hostname = 'localhost'; 
 });
 
 app.configure('production', function(){
   app.use(express.errorHandler()); 
+  hostname = 'musescore.no.de';
 });
 
 // Routes
@@ -61,7 +63,7 @@ app.post('/create', function(req, res) {
 	      				path:scoreURL.pathname + scoreURL.search
 	      				};
 	      	http.get(options, function(resp) {
-	      		if(resp.statusCode == 200) 
+	      		if(resp.statusCode == 200) {
 	      		    var data = '';
 	      			resp.on('data', function(chunk) {   
 	      				data += chunk;
@@ -81,7 +83,8 @@ app.post('/create', function(req, res) {
            					});	
            				});	
       				});
-	      		}); 
+	      		}
+	      	}); 
 	      }  
 	 }).on('error', function(e) {  
 	      console.log("Got error: " + e.message);   
@@ -99,13 +102,36 @@ app.get('/session/:sessionid', function(req, res, next){
 			return;
 		}
 		var score = JSON.parse(data);
-		res.render('session.jade', {title:"Sheet music session", 
-			id:score.id, 
-			secret:score.secret, 
-			pageCount: score.pageCount,
-			sessionId: sessionId, 
-			layout:false});	
-	});
+		
+		var options = {  
+	           host: 'api.musescore.com',   
+	           port: 80,   
+	           path: '/services/rest/score/'+score.id+'.json?&oauth_consumer_key=musichackday'  
+	    };
+      	http.get(options, function(resp) {
+      		if(resp.statusCode == 200) {
+      		    var data = '';
+      			resp.on('data', function(chunk) {   
+      				data += chunk;
+     				}).on('error', function(e) {  
+      			  console.log("Got error: " + e.message);   
+ 				});
+   				resp.on('end', function() {
+   				    var scoreData = JSON.parse(data); 
+        			console.log(scoreData.id + ' - ' + scoreData.secret + ' - ' + scoreData.metadata.pages);
+        			res.render('session.jade', {title:scoreData.title, 
+						id:scoreData.id, 
+						secret:scoreData.secret, 
+						pageCount: scoreData.metadata.pages,
+						sessionId: sessionId, 
+						layout:false,
+						hostname:hostname,
+						scoreChanged: scoreData.dates.lastupdate
+					}); // res.render			
+   				}); //resp.on
+      		}//if 200
+      	}); //http.get 
+	}); //redisClient.get
 	
 });
 

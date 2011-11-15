@@ -4,13 +4,13 @@ html
     title= title
     script(type='text/javascript', src='/javascripts/jquery-1.4.2.min.js')
     script(type='text/javascript', src='/javascripts/jquery.mpager.js')
-    script(type='text/javascript', src='http://musescore.no.de/faye.js') 
+    script(type='text/javascript', src='http://#{hostname}/faye.js') 
     //link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel='stylesheet', href='/stylesheets/smp.css')
     script
       var mpager;  
       $(document).ready(function() {
-        var client = new Faye.Client('http://musescore.no.de/faye');
+        var client = new Faye.Client('http://#{hostname}/faye');
         var subscription = client.subscribe('/#{sessionId}/*', function(message) {
           var measureNumber = message.mn;
           mpager.goTo(measureNumber-1);
@@ -31,6 +31,7 @@ html
           pages : #{pageCount},
           scoreId : #{id},
           scoreSecret : '#{secret}',
+          scoreChanged: '#{scoreChanged}',
           apiServer : "http://api.musescore.com",
           staticBucket : "static.musescore.com",
           measureClickCallback : measureClick,
@@ -38,6 +39,7 @@ html
           pageWidth: pageWidth,
           defaultMeasure: -1,
           bottomPadding: 10,
+          scrollToMeasure: true,
           consumerKey: "musichackday"
         }); 
       

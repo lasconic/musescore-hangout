@@ -36,47 +36,66 @@ html
           console.log(error.message);
         });
         
+        var subscriptionLoadScore = client.subscribe('/#{sessionId}/loadscore', function(message) {
+          var id = message.id;
+          loadScoreById(id);
+        });
+        subscriptionLoadScore.callback(function() {
+          console.log('subscriptionLoadScore is now active!');
+        });
+        subscriptionLoadScore.errback(function(error) {
+          console.log(error.message);
+        });
+                
+        loadScoreById('#{id}');
         
-        var mmToPixel = (827/210);
-
-        var maxPageWidth = $('#smp-pages').width();
-
-        var dimensions = "210x297"
-        var pageWidth = parseInt(dimensions.split('x')[0]) * mmToPixel;
-
-
-
-        mpager = $("#smp-pages").mpager({
-
-          api: true,
-
-          pages : #{pageCount},
-
-          scoreId : #{id},
-
-          scoreSecret : '#{secret}',
-          scoreChanged: '#{scoreChanged}',
-
-          apiServer : "http://api.musescore.com",
-
-          staticBucket : "static.musescore.com",
-
-          measureClickCallback : measureClick,
-
-          //measureChangeCallback: measureChange,
-
-          pageWidth: pageWidth,
-
-          defaultMeasure: -1,
-
-          bottomPadding: 10,
-          scrollToMeasure: true,
-
-          consumerKey: "musichackday"
-
-        }); 
+        function loadScoreById(id){
+            $.getJSON('http://api.musescore.com/services/rest/score/'+id+'.jsonp?oauth_consumer_key=musichackday&callback=?', 
+                function(data) {
+                    loadScore(data['id'], data['secret'], data['metadata']['pages'], data['metadata']['dimensions'], data['dates']['lastupdate']);
+                }
+            );
+        }
+        
+        function loadScore(id, secret, pageCount, dimensions, scoreChanged) {
+            var mmToPixel = (827/210);
+            
+            var maxPageWidth = $('#smp-pages').width();
+            var pageWidth = parseInt(dimensions.split('x')[0]) * mmToPixel;
+            
+            //clear it
+            $('#smp-pages').html('');
+            
+            mpager = $("#smp-pages").mpager({
+    
+              api: true,
+    
+              pages : pageCount,
+    
+              scoreId : id,
+    
+              scoreSecret : secret,
+              scoreChanged: scoreChanged,
+    
+              apiServer : "http://api.musescore.com",
+    
+              staticBucket : "static.musescore.com",
+    
+              measureClickCallback : measureClick,
+    
+              //measureChangeCallback: measureChange,
+    
+              pageWidth: pageWidth,
+    
+              defaultMeasure: -1,
+    
+              bottomPadding: 10,
+              scrollToMeasure: true,
+    
+              consumerKey: "musichackday"
+            });
+        }            
       
-
         function measureClick(element, id) {
           mpager.highlightMeasure(element, id);
 

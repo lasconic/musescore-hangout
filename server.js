@@ -161,6 +161,18 @@ app.get('/session/:sessionid/gotourl', function(req, res, next){
   res.end('Broadcasted go to url '+url+' in session ' + sessionId + '\n');	
 });
 
+app.get('/session/:sessionid/loadscore', function(req, res, next){
+  var sessionId = req.params.sessionid;
+  var params = require('url').parse(req.url, true);
+  var id = params['query']['id'];
+
+  bayeux.getClient().publish('/' + sessionId + '/loadscore', {
+    id:id
+  });
+  
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end('Broadcasted load score '+id+' in session ' + sessionId + '\n');	
+});
 
 app.listen(80);
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);

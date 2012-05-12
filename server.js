@@ -148,6 +148,19 @@ app.get('/session/:sessionid/gotomeasure', function(req, res, next){
   res.end('Broadcasted go to measure '+m+' in session ' + sessionId + '\n');	
 });
 
+app.get('/session/:sessionid/gotourl', function(req, res, next){
+  var sessionId = req.params.sessionid;
+  var params = require('url').parse(req.url, true);
+  var url = params['query']['url'];
+
+  bayeux.getClient().publish('/' + sessionId + '/gotourl', {
+    url:url
+  });
+  
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end('Broadcasted go to url '+url+' in session ' + sessionId + '\n');	
+});
+
 
 app.listen(80);
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);

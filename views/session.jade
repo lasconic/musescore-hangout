@@ -9,43 +9,80 @@ html
     link(rel='stylesheet', href='/stylesheets/smp.css')
     script
       var mpager;  
+
       $(document).ready(function() {
+
         var client = new Faye.Client('http://#{hostname}/faye');
-        var subscription = client.subscribe('/#{sessionId}/*', function(message) {
+        var subscriptionGoToMeasure = client.subscribe('/#{sessionId}/gotomeasure', function(message) {
           var measureNumber = message.mn;
+
           mpager.goTo(measureNumber-1);
         });
-        subscription.callback(function() {
-          console.log('Subscription is now active!');
+        subscriptionGoToMeasure.callback(function() {
+          console.log('subscriptionGoToMeasure is now active!');
         });
-        subscription.errback(function(error) {
+        subscriptionGoToMeasure.errback(function(error) {
           console.log(error.message);
         });
+
+        var subscriptionGoToUrl = client.subscribe('/#{sessionId}/gotourl', function(message) {
+          var url = message.url;
+          window.location = url;
+        });
+        subscriptionGoToUrl.callback(function() {
+          console.log('subscriptionGoToUrl is now active!');
+        });
+        subscriptionGoToUrl.errback(function(error) {
+          console.log(error.message);
+        });
+        
+        
         var mmToPixel = (827/210);
+
         var maxPageWidth = $('#smp-pages').width();
+
         var dimensions = "210x297"
         var pageWidth = parseInt(dimensions.split('x')[0]) * mmToPixel;
 
+
+
         mpager = $("#smp-pages").mpager({
+
           api: true,
+
           pages : #{pageCount},
+
           scoreId : #{id},
+
           scoreSecret : '#{secret}',
           scoreChanged: '#{scoreChanged}',
+
           apiServer : "http://api.musescore.com",
+
           staticBucket : "static.musescore.com",
+
           measureClickCallback : measureClick,
+
           //measureChangeCallback: measureChange,
+
           pageWidth: pageWidth,
+
           defaultMeasure: -1,
+
           bottomPadding: 10,
           scrollToMeasure: true,
+
           consumerKey: "musichackday"
+
         }); 
       
+
         function measureClick(element, id) {
           mpager.highlightMeasure(element, id);
+
         }
+
       });
   body
+
     #smp-pages.smp-pages  

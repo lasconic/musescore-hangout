@@ -50,7 +50,32 @@ app.post('/create', function(req, res) {
 	var msurl = req.param('msurl', 'default');
  
 	 // GET.   
-	 var options = {  
+	 getScoreMetadata(msurl, function(resp) {
+	      		if(resp.statusCode == 200) {
+	      		    var data = '';
+	      			resp.on('data', function(chunk) {   
+	      				data += chunk;
+      				}).on('error', function(e) {  
+	      			  console.log("Got error: " + e.message);   
+	 				});
+      				resp.on('end', function() {
+      				    var score = JSON.parse(data); 
+           				console.log(score.id + ' - ' + score.secret + ' - ' + score.metadata.pages);
+           				var scoreSave = {id:score.id, secret : score.secret, pageCount:score.metadata.pages};
+           				redisClient.incr( 'next.session.id' , function (err, id) {
+           					var sessionId = tools.randomString(5) + id;
+           					redisClient.set('session:'+sessionId, JSON.stringify(scoreSave), function() {
+           						var msg = 'You can go to your <a href="/session/' + sessionId + '">sheet music session</a>';
+           						res.send(msg);
+           					});	
+           				});	
+      				});
+	      		}
+	      	});   
+});
+	
+var getScoreMetadata = function(msurl, endfunction) {
+ var options = {  
 	           host: 'api.musescore.com',   
 	           port: 80,   
 	           path: '/services/rest/resolve.json?url=' + encodeURIComponent(msurl) + '&oauth_consumer_key=musichackday'  
@@ -62,34 +87,12 @@ app.post('/create', function(req, res) {
 	      				port:80,
 	      				path:scoreURL.pathname + scoreURL.search
 	      				};
-	      	http.get(options, function(resp) {
-	      		if(resp.statusCode == 200) {
-	      		    var data = '';
-	      			resp.on('data', function(chunk) {   
-	      				data += chunk;
-      				}).on('error', function(e) {  
-	      			  console.log("Got error: " + e.message);   
-	 				});
-      				resp.on('end', function() {
-      				    var score = JSON.parse(data); 
-           				console.log(score.id + ' - ' + score.secret + ' - ' + score.metadata.pages);
-           				
-           				var scoreSave = {id:score.id, secret : score.secret, pageCount:score.metadata.pages};
-           				redisClient.incr( 'next.session.id' , function (err, id) {
-           					var sessionId = tools.randomString(5) + id;
-           					redisClient.set('session:'+sessionId, JSON.stringify(scoreSave), function() {
-           						var msg = 'You can go to your <a href="/session/' + sessionId + '">sheet music session</a>';
-           						res.send(msg);
-           					});	
-           				});	
-      				});
-	      		}
-	      	}); 
+	      	http.get(options, endfunction); 
 	      }  
 	 }).on('error', function(e) {  
 	      console.log("Got error: " + e.message);   
-	 });  
-	});
+	 }); 
+}
 	
 app.get('/session/:sessionid', function(req, res, next){
 	var sessionId = req.params.sessionid;
@@ -164,14 +167,35 @@ app.get('/session/:sessionid/gotourl', function(req, res, next){
 app.get('/session/:sessionid/loadscore', function(req, res, next){
   var sessionId = req.params.sessionid;
   var params = require('url').parse(req.url, true);
-  var id = params['query']['id'];
-
-  bayeux.getClient().publish('/' + sessionId + '/loadscore', {
-    id:id
-  });
+  var url = params['query']['url'];
   
-  res.writeHead(200, {'Content-Type': 'text/plain'});
-  res.end('Broadcasted load score '+id+' in session ' + sessionId + '\n');	
+  getScoreMetadata(url, function(resp) {
+	      		if(resp.statusCode == 200) {
+	      		    var data = '';
+	      			resp.on('data', function(chunk) {   
+	      				data += chunk;
+      				}).on('error', function(e) {  
+	      			  console.log("Got error: " + e.message);   
+	 				});
+      				resp.on('end', function() {
+      				    var score = JSON.parse(data); 
+           				console.log(score.id + ' - ' + score.secret + ' - ' + score.metadata.pages);
+           				
+           				//publish new score to connected client
+  						bayeux.getClient().publish('/' + sessionId + '/loadscore', {
+    					  id:score.id
+  						});
+           				
+           				var scoreSave = {id:score.id, secret : score.secret, pageCount:score.metadata.pages};
+						redisClient.set('session:'+sessionId, JSON.stringify(scoreSave), function() {
+							var msg = 'Session ' + sessionId + ' now displays score "' + score.title + '"';
+							console.log(msg);
+							res.send('Broadcasted load score <a href="'+url+'">'+score.title+'</a> in session '+
+							  '<a href="/session/' + sessionId + '">'+sessionId+'</a>\n');
+						});	
+      				});
+	      		}
+	      	});   	
 });
 
 app.listen(80);

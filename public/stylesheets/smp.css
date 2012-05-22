@@ -27,7 +27,7 @@ and (max-device-width : 1024px)
 and (orientation : landscape) {
 /* Styles */
     #smp-pages {
-        width: 1020px;
+        width: 1016px;
     }
 }
 
@@ -38,7 +38,7 @@ and (max-device-width : 1024px)
 and (orientation : portrait) {
 /* Styles */
     #smp-pages {
-        width: 764px;
+        width: 760px;
     }
 }
 

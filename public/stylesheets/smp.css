@@ -1,67 +1,6 @@
 #smp-pages {
-  /*width: 1008px;*/
   width: 99%;
 }
-
-/* Smartphones (landscape) ----------- */
-/*@media only screen
-and (min-width : 321px) {
-    #smp-pages {
-        width: 304px;
-    }
-}*/
-
-/* Smartphones (portrait) ----------- */
-/*@media only screen
-and (max-width : 320px) {
-    #smp-pages {
-        width: 304px;
-    }
-}*/
-
-/* iPads (landscape) ----------- */
-/*@media only screen
-and (min-device-width : 768px)
-and (max-device-width : 1024px)
-and (orientation : landscape) {
-    #smp-pages {
-        width: 1008px;
-    }
-}*/
-
-/* iPads (portrait) ----------- */
-/*@media only screen
-and (min-device-width : 768px)
-and (max-device-width : 1024px)
-and (orientation : portrait) {
-    #smp-pages {
-        width: 752px;
-    }
-}*/
-
-/* Desktops and laptops ----------- */
-/*@media only screen
-and (min-width : 1224px) {
-    #smp-pages {
-        width: 1200px;
-    }
-}*/
-
-/* iPhone 4 ----------- */
-/*@media
-only screen and (-webkit-min-device-pixel-ratio : 1.5),
-only screen and (min-device-pixel-ratio : 1.5) {
-    #smp-pages {
-      width: 944px;
-    }
-}*/
-
-/*@media only screen (min-width: 768px) and (max-width: 1024px) and (-webkit-min-device-pixel-ratio: 2) 
-{
-    #smp-pages {
-        width: 2036px;
-    }
-}*/
 
 div.mpager-page {
   position:relative;

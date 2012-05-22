@@ -1,7 +1,7 @@
 !!!
 html
   head
-    meta(name='viewport', content='width=768px, maximum-scale=1.0, minimum-scale=1.0')
+    meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1')
     title= title
     script(type='text/javascript', src='/javascripts/jquery-1.4.2.min.js')
     script(type='text/javascript', src='/javascripts/jquery.mpager.js')
@@ -13,7 +13,7 @@ html
 
       $(document).ready(function() {
 
-        /*var client = new Faye.Client('http://#{hostname}/faye');
+        var client = new Faye.Client('http://#{hostname}/faye');
         var subscriptionGoToMeasure = client.subscribe('/#{sessionId}/gotomeasure', function(message) {
           var measureNumber = message.mn;
 
@@ -46,7 +46,7 @@ html
         });
         subscriptionLoadScore.errback(function(error) {
           console.log(error.message);
-        });*/
+        });
                 
         loadScoreById('#{id}');
         

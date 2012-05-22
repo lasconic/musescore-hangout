@@ -45,7 +45,7 @@ and (max-device-width : 1024px)
 and (orientation : portrait) {
 /* Styles */
     #smp-pages {
-        width: 760px;
+        width: 752px;
     }
 }
 

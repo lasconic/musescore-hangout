@@ -13,7 +13,7 @@ html
 
       $(document).ready(function() {
 
-        var client = new Faye.Client('http://#{hostname}/faye');
+        /*var client = new Faye.Client('http://#{hostname}/faye');
         var subscriptionGoToMeasure = client.subscribe('/#{sessionId}/gotomeasure', function(message) {
           var measureNumber = message.mn;
 
@@ -46,7 +46,7 @@ html
         });
         subscriptionLoadScore.errback(function(error) {
           console.log(error.message);
-        });
+        });*/
                 
         loadScoreById('#{id}');
         

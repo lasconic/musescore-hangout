@@ -34,7 +34,7 @@ and (max-device-width : 1024px)
 and (orientation : landscape) {
 /* Styles */
     #smp-pages {
-        width: 300px;
+        width: 1000px;
     }
 }
 

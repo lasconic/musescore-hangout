@@ -50,7 +50,7 @@ app.post('/create', function(req, res) {
 	var msurl = req.param('msurl', 'default');
  
 	 // GET.   
-	 getScoreMetadata(msurl, function(resp) {
+	 resolveScore(msurl, function(resp) {
 	      		if(resp.statusCode == 200) {
 	      		    var data = '';
 	      			resp.on('data', function(chunk) {   
@@ -74,7 +74,7 @@ app.post('/create', function(req, res) {
 	      	});   
 });
 	
-var getScoreMetadata = function(msurl, endfunction) {
+var resolveScore = function(msurl, endfunction) {
  var options = {  
 	           host: 'api.musescore.com',   
 	           port: 80,   
@@ -97,7 +97,17 @@ var getScoreMetadata = function(msurl, endfunction) {
 app.get('/session/:sessionid', function(req, res, next){
 	var sessionId = req.params.sessionid;
 	console.log("sessionId " + sessionId);
-	redisClient.get('session:'+sessionId, function(err, data){
+	scorePage(sessionId, 'session.jade', res);
+});
+
+app.get('/session/:sessionid/sessioncontrol', function(req, res, next){
+	var sessionId = req.params.sessionid;
+	console.log("sessionId " + sessionId);
+	scorePage(sessionId, 'sessioncontrol.jade', res);
+});
+
+var scorePage = function(sessionId, template, res) {
+    redisClient.get('session:'+sessionId, function(err, data){
 		if(!data) {
 			res.writeHead(404);
 			res.write('No session found.');
@@ -122,7 +132,7 @@ app.get('/session/:sessionid', function(req, res, next){
    				resp.on('end', function() {
    				    var scoreData = JSON.parse(data); 
         			console.log(scoreData.id + ' - ' + scoreData.secret + ' - ' + scoreData.metadata.pages);
-        			res.render('session.jade', {title:scoreData.title, 
+        			res.render(template, {title:scoreData.title, 
 						id:scoreData.id, 
 						secret:scoreData.secret, 
 						pageCount: scoreData.metadata.pages,
@@ -135,8 +145,7 @@ app.get('/session/:sessionid', function(req, res, next){
       		}//if 200
       	}); //http.get 
 	}); //redisClient.get
-	
-});
+}
 
 app.get('/session/:sessionid/gotomeasure', function(req, res, next){
   var sessionId = req.params.sessionid;
@@ -169,7 +178,7 @@ app.get('/session/:sessionid/loadscore', function(req, res, next){
   var params = require('url').parse(req.url, true);
   var url = params['query']['url'];
   
-  getScoreMetadata(url, function(resp) {
+  resolveScore(url, function(resp) {
 	      		if(resp.statusCode == 200) {
 	      		    var data = '';
 	      			resp.on('data', function(chunk) {   

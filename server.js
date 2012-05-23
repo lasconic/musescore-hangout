@@ -179,7 +179,7 @@ app.get('/session/:sessionid/loadscore', function(req, res, next){
   var sessionId = req.params.sessionid;
   var params = require('url').parse(req.url, true);
   var url = params['query']['url'];
-  
+  console.log("loadscore " + url);
   resolveScore(url, function(resp) {
 	      		if(resp.statusCode == 200) {
 	      		    var data = '';

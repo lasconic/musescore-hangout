@@ -38,12 +38,14 @@ html
         function loadScoreById(id){
             $.getJSON('http://api.musescore.com/services/rest/score/'+id+'.jsonp?oauth_consumer_key=musichackday&callback=?', 
                 function(data) {
-                    loadScore(data['id'], data['secret'], data['metadata']['pages'], data['metadata']['dimensions'], data['dates']['lastupdate']);
+                    loadScore(data['id'], data['secret'], data['metadata']['pages'], data['metadata']['dimensions'], data['dates']['lastupdate'], data['title']);
                 }
             );
         }
         
-        function loadScore(id, secret, pageCount, dimensions, scoreChanged) {
+        function loadScore(id, secret, pageCount, dimensions, scoreChanged, title) {
+        
+            document.title = title;
             var mmToPixel = (827/210);
             
             var maxPageWidth = $('#smp-pages').width();

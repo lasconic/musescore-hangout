@@ -152,7 +152,8 @@ app.get('/session/:sessionid/gotomeasure', function(req, res, next){
   var params = require('url').parse(req.url, true);
   var m = params['query']['measure'];
 
-  bayeux.getClient().publish('/' + sessionId + '/gotomeasure', {
+  bayeux.getClient().publish('/' + sessionId + '/action', {
+    command:"gotomeasure",
     mn:m
   });
   
@@ -165,7 +166,8 @@ app.get('/session/:sessionid/gotourl', function(req, res, next){
   var params = require('url').parse(req.url, true);
   var url = params['query']['url'];
 
-  bayeux.getClient().publish('/' + sessionId + '/gotourl', {
+  bayeux.getClient().publish('/' + sessionId + '/action', {
+    command:"gotourl",
     url:url
   });
   
@@ -191,7 +193,8 @@ app.get('/session/:sessionid/loadscore', function(req, res, next){
            				console.log(score.id + ' - ' + score.secret + ' - ' + score.metadata.pages);
            				
            				//publish new score to connected client
-  						bayeux.getClient().publish('/' + sessionId + '/loadscore', {
+  						bayeux.getClient().publish('/' + sessionId + '/action', {
+    					  command:"loadscore",
     					  id:score.id
   						});
            				

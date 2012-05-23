@@ -12,37 +12,24 @@ html
       $(document).ready(function() {
 
         var client = new Faye.Client('http://#{hostname}/faye');
-        var subscriptionGoToMeasure = client.subscribe('/#{sessionId}/gotomeasure', function(message) {
-          var measureNumber = message.mn;
-
-          mpager.goTo(measureNumber-1);
+        var subscription = client.subscribe('/#{sessionId}/action', function(message) {
+          if (message.command == "gotomeasure") {
+            var measureNumber = message.mn;
+            mpager.goTo(measureNumber-1);
+          }
+          else if (message.command == "gotourl") {
+            var url = message.url;
+            window.location = url;
+          }
+          else if (message.command == "loadscore") {
+            var id = message.id;
+            loadScoreById(id);
+          }
         });
-        subscriptionGoToMeasure.callback(function() {
-          console.log('subscriptionGoToMeasure is now active!');
+        subscription.callback(function() {
+          console.log('subscription is now active!');
         });
-        subscriptionGoToMeasure.errback(function(error) {
-          console.log(error.message);
-        });
-
-        var subscriptionGoToUrl = client.subscribe('/#{sessionId}/gotourl', function(message) {
-          var url = message.url;
-          window.location = url;
-        });
-        subscriptionGoToUrl.callback(function() {
-          console.log('subscriptionGoToUrl is now active!');
-        });
-        subscriptionGoToUrl.errback(function(error) {
-          console.log(error.message);
-        });
-        
-        var subscriptionLoadScore = client.subscribe('/#{sessionId}/loadscore', function(message) {
-          var id = message.id;
-          loadScoreById(id);
-        });
-        subscriptionLoadScore.callback(function() {
-          console.log('subscriptionLoadScore is now active!');
-        });
-        subscriptionLoadScore.errback(function(error) {
+        subscription.errback(function(error) {
           console.log(error.message);
         });
                 
@@ -97,7 +84,8 @@ html
       
         function measureClick(element, id) {
           mpager.highlightMeasure(element, id);
-          client.publish('/#{sessionId}/gotomeasure', {
+          client.publish('/#{sessionId}/action', {
+            command:"gotomeasure",
             mn: (id + 1)
           });
         }

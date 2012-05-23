@@ -3,8 +3,12 @@
 }
 #smp-pages-control {
   width: 30%;
+  float:left;
 }
 
+.controls {
+   margin-left:40%;
+}
 
 div.mpager-page {
   position:relative;

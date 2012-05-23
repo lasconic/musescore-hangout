@@ -18,8 +18,8 @@ html
             mpager.goTo(measureNumber-1);
           }
           else if (message.command == "gotourl") {
-            var url = message.url;
-            window.location = url;
+            //var url = message.url;
+            //window.location = url;
           }
           else if (message.command == "loadscore") {
             var id = message.id;
@@ -90,6 +90,21 @@ html
             mn: (id + 1)
           });
         }
+        $(".loadscore").click(function() {
+          client.publish('/#{sessionId}/action', {
+            command:"loadscore",
+            id:$(this).attr("data-scoreid")
+          });
+          return false;
+        });
+        
+        $(".gotourl").click(function() {
+          client.publish('/#{sessionId}/action', {
+            command:"gotourl",
+            url:$(this).attr("data-url")
+          });
+          return false;
+        });
 
       });
     script
@@ -104,4 +119,18 @@ html
        })();
   body
 
-    #smp-pages-control.smp-pages  
+    #smp-pages-control.smp-pages
+    #controls.controls
+      ul
+        li.first: a.loadscore(href='#', data-scoreid="48725") load Aria
+        li: a.loadscore(href='#', data-scoreid="48726") load Variation 1
+        li: a.loadscore(href='#', data-scoreid="48727") load Variation 7
+        li: a.loadscore(href='#', data-scoreid="48728") load Variation 8
+        li: a.loadscore(href='#', data-scoreid="48729") load Variation 9
+        li: a.loadscore(href='#', data-scoreid="48730") load Variation 13
+        li: a.loadscore(href='#', data-scoreid="48731") load Variation 16
+        li: a.loadscore(href='#', data-scoreid="48732") load Variation 21
+        li: a.loadscore(href='#', data-scoreid="48733") load Variation 26
+        li: a.loadscore(href='#', data-scoreid="48734") load Variation 30
+        li: a.gotourl(href='#', data-url="http://cdn.labs.musescore.com.s3.amazonaws.com/sessions/stars.html") load Final page
+      

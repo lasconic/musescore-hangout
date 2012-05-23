@@ -3,7 +3,7 @@ html
   head
     title= title
     script(type='text/javascript', src='http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js')
-    script(type='text/javascript', src='http://cdn.labs.musescore.com/sessions/jquery.mpager.js')
+    script(type='text/javascript', src='/javascripts/jquery.mpager.js')
     script(type='text/javascript', src='http://cdn.labs.musescore.com/sessions/faye.js') 
     link(rel='stylesheet', href='/stylesheets/smp.css')
     script
@@ -46,13 +46,13 @@ html
         function loadScore(id, secret, pageCount, dimensions, scoreChanged) {
             var mmToPixel = (827/210);
             
-            var maxPageWidth = $('#smp-pages').width();
+            var maxPageWidth = $('#smp-pages-control').width();
             var pageWidth = parseInt(dimensions.split('x')[0]) * mmToPixel;
             
             //clear it
-            $('#smp-pages').html('');
+            $('#smp-pages-control').html('');
             
-            mpager = $("#smp-pages").mpager({
+            mpager = $("#smp-pages-control").mpager({
     
               api: true,
     
@@ -78,7 +78,8 @@ html
               bottomPadding: 10,
               scrollToMeasure: true,
     
-              consumerKey: "musichackday"
+              consumerKey: "musichackday",
+              cMode: 0
             });
         }            
       
@@ -103,4 +104,4 @@ html
        })();
   body
 
-    #smp-pages.smp-pages  
+    #smp-pages-control.smp-pages  

@@ -33,9 +33,9 @@
 		
 		this.factor = 12;
     
-    this.NORMAL_VIEW = 0;
-    this.SLIDESHOW_VIEW = 1;
-    this.cMode = this.SLIDESHOW_VIEW;
+        this.NORMAL_VIEW = 0;
+        this.SLIDESHOW_VIEW = 1;
+        this.cMode = opts.cMode;
 		this._init();
 	};
 	
@@ -57,6 +57,7 @@
 			scrollToMeasure: false,
 			omitFirstPage: false,
 			consumerKey: "your-oauth-consumer-key",
+			cMode: 1 //SLIDESHOW
 			};
 	
 	var $mpager = $.mpager;
@@ -236,6 +237,8 @@
             }
         },
         _isScrolledIntoViewV:function(elem){
+            if(!$(elem).offset())
+                return true;
         	var docViewTop = $(window).scrollTop();
         	var docViewBottom = docViewTop + $(window).height() - this.bottomPadding;
 
@@ -245,6 +248,8 @@
         	return ((elemBottom >= docViewTop) && (elemTop <= docViewBottom) && (elemBottom <= docViewBottom) && (elemTop >= docViewTop));
         },
         _isScrolledIntoViewH:function(elem){
+        	if(!$(elem).offset())
+                return true;
         	var docViewLeft = $(window).scrollLeft();
         	var docViewRight = docViewLeft + $(window).width() - this.bottomPadding;
 

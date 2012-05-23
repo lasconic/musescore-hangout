@@ -1,6 +1,10 @@
 #smp-pages {
   width: 99%;
 }
+#smp-pages-control {
+  width: 30%;
+}
+
 
 div.mpager-page {
   position:relative;

@@ -40,7 +40,7 @@ app.configure('development', function(){
 
 app.configure('production', function(){
   app.use(express.errorHandler()); 
-  hostname = 'musescore.no.de';
+  hostname = 'sessions.musescore.com';
 });
 
 // Routes

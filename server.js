@@ -10,7 +10,7 @@ var express = require('express')
   , faye = require('faye')
   , tools = require('./tools');
 
-var hostname = 'musescore.no.de';
+var hostname = 'sessions.musescore.com';
 var bayeux = new faye.NodeAdapter({mount: '/faye', timeout: 45});
 
 // Web Server, Express ------------------------------------------

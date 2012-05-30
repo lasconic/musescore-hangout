@@ -79,8 +79,11 @@
         		$(".pageimg").width(this.maxPageWidth);
         		
             this.processSwitchToView(this.cMode);
-        		
-            $.getJSON(this.apiServer + "/services/rest/score/" + this.scoreId + "/space.jsonp?secret=" + this.scoreSecret + "&oauth_consumer_key="+ this.consumerKey +"&callback=?", function(data) {
+        	$.ajax({
+              url: this.apiServer + "/services/rest/score/" + this.scoreId + "/space.jsonp?secret=" + this.scoreSecret + "&oauth_consumer_key="+ this.consumerKey,
+              dataType: 'jsonp',
+              jsonpCallback:"space",
+              success: function(data) {
         			self.elements = data;
         			self.measureCount = data.length;
         			self.pageArray = new Array();
@@ -107,7 +110,8 @@
         					   return false;
         				  });
         			}
-        		});
+        	    }
+            });	
         },
         
         refreshPages: function() {

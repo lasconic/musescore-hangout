@@ -36,11 +36,14 @@ html
         loadScoreById('#{id}');
         
         function loadScoreById(id){
-            $.getJSON('http://api.musescore.com/services/rest/score/'+id+'.jsonp?oauth_consumer_key=musichackday&callback=?', 
-                function(data) {
+            $.ajax({
+              url: 'http://api.musescore.com/services/rest/score/'+id+'.jsonp?oauth_consumer_key=musichackday',
+              dataType: 'jsonp',
+              jsonpCallback:"nodeinfo",
+              success: function(data) {
                     loadScore(data['id'], data['secret'], data['metadata']['pages'], data['metadata']['dimensions'], data['dates']['lastupdate'], data['title']);
                 }
-            );
+            });
         }
         
         function loadScore(id, secret, pageCount, dimensions, scoreChanged, title) {

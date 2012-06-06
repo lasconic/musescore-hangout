@@ -5,17 +5,23 @@ html
     script(type='text/javascript', src='http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js')
     script(type='text/javascript', src='http://cdn.labs.musescore.com/sessions/jquery.mpager.min.js')
     script(type='text/javascript', src='http://cdn.labs.musescore.com/sessions/faye.js') 
-    link(rel='stylesheet', href='http://cdn.labs.musescore.com/sessions/smp.min.css')
+    //link(rel='stylesheet', href='http://cdn.labs.musescore.com/sessions/smp.min.css')
+    link(rel='stylesheet', href='/stylesheets/smp.css')
     script
       var mpager;  
 
       $(document).ready(function() {
-
+        $("#overlay").hide();
+        var delay = #{delay};
+        if(delay > 0) {
+          $("#overlay").toggle();
+          setTimeout(function() { $("#overlay").toggle() }, delay);
+        }
         var client = new Faye.Client('http://#{hostname}/faye');
         var subscription = client.subscribe('/#{sessionId}/action', function(message) {
           if (message.command == "gotomeasure") {
             var measureNumber = message.mn;
-            mpager.goTo(measureNumber-1);
+            setTimeout(function() {mpager.goTo(measureNumber-1)}, delay);
           }
           else if (message.command == "gotourl") {
             var url = message.url;
@@ -90,7 +96,7 @@ html
         function measureClick(element, id) {
           mpager.highlightMeasure(element, id);
 
-        }
+        }        
       });
     script
       var _gaq = _gaq || [];
@@ -104,4 +110,7 @@ html
        })();      
   body
 
-    #smp-pages.smp-pages  
+    #smp-pages.smp-pages
+    #overlay
+      #overlay-content
+        p Please wait...

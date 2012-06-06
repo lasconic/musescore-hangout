@@ -97,16 +97,18 @@ var resolveScore = function(msurl, endfunction) {
 app.get('/session/:sessionid', function(req, res, next){
 	var sessionId = req.params.sessionid;
 	console.log("sessionId " + sessionId);
-	scorePage(sessionId, 'session.jade', res);
+	scorePage(sessionId, 'session.jade', req, res);
 });
 
 app.get('/session/:sessionid/sessioncontrol', function(req, res, next){
 	var sessionId = req.params.sessionid;
 	console.log("sessionId " + sessionId);
-	scorePage(sessionId, 'sessioncontrol.jade', res);
+	scorePage(sessionId, 'sessioncontrol.jade', req, res);
 });
 
-var scorePage = function(sessionId, template, res) {
+var scorePage = function(sessionId, template, req, res) {
+    var delay = req.param("delay", 0);
+    console.log("delay " + delay);
     redisClient.get('session:'+sessionId, function(err, data){
 		if(!data) {
 			res.writeHead(404);
@@ -139,7 +141,8 @@ var scorePage = function(sessionId, template, res) {
 						sessionId: sessionId, 
 						layout:false,
 						hostname:hostname,
-						scoreChanged: scoreData.dates.lastupdate
+						scoreChanged: scoreData.dates.lastupdate,
+						delay:delay
 					}); // res.render			
    				}); //resp.on
       		}//if 200

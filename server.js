@@ -10,7 +10,7 @@ var express = require('express')
   , faye = require('faye')
   , tools = require('./tools');
 
-var hostname = 'sessions.musescore.com';
+var hostname = 'musescore.no.de';
 var bayeux = new faye.NodeAdapter({mount: '/faye', timeout: 45});
 
 // Web Server, Express ------------------------------------------
@@ -40,7 +40,7 @@ app.configure('development', function(){
 
 app.configure('production', function(){
   app.use(express.errorHandler()); 
-  hostname = 'sessions.musescore.com';
+  hostname = 'musescore.no.de';
 });
 
 // Routes

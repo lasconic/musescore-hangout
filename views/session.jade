@@ -17,6 +17,13 @@ html
           $("#overlay").toggle();
           setTimeout(function() { $("#overlay").toggle() }, delay);
         }
+        
+        $(".trigger").click(function(){
+            $(".panel").toggle("fast");
+            $(this).toggleClass("active");
+            return false;
+        });
+        
         var client = new Faye.Client('http://#{hostname}/faye');
         var subscription = client.subscribe('/#{sessionId}/action', function(message) {
           if (message.command == "gotomeasure") {
@@ -30,6 +37,38 @@ html
           else if (message.command == "loadscore") {
             var id = message.id;
             loadScoreById(id);
+          }
+          else if (message.command == "draw") {
+            var cmd = message.cmd; 
+            switch ( cmd ) {
+                case "mousedown":
+                    var page = message.page;
+                    var canvas = $('#canvas-' + page);
+                    var context = canvas[0].getContext('2d');
+                    context.beginPath();
+                    context.moveTo(message.x, message.y);
+                    break;
+                case "mousemove":
+                    var page = message.page;
+                    var canvas = $('#canvas-' + page);
+                    var context = canvas[0].getContext('2d');
+                    var tmpColor = context.strokeStyle;
+                    var color = message.color;
+                    context.strokeStyle = color;
+                    context.lineTo(message.x, message.y);
+                    context.stroke();
+                    context.strokeStyle = tmpColor;
+                    break;
+                case "mouseup":    
+                    break;
+                case "clear":
+                    $('.canvas').each(function(index) {
+                        var canvas = $(this);
+                        var context = canvas[0].getContext('2d');
+                        context.clearRect(0,0,canvas.width,canvas.height);
+                    });
+                    break;
+            }
           }
         });
         subscription.callback(function() {
@@ -89,13 +128,162 @@ html
               bottomPadding: 10,
               scrollToMeasure: true,
     
-              consumerKey: "musichackday"
+              consumerKey: "musichackday",
+              cMode: 0
             });
-        }            
-      
+            $('.mpager-page').each(function(index) {
+                var w = $('#pageimg-' + index).width();
+                var h = $('#pageimg-' + index).width();
+                $(this).append('<canvas class="canvas" id="canvas-'+ index +'" width="'+w+'px" height="'+h+'">Canvas not supported</canvas>');
+            });
+            $('.canvas').each(function(index) {
+                var canvas = $(this);
+                var role = 'teacher';
+                var color = "rgba(255,255,0,0.1)";
+                // get the canvas element and its context
+                var context = canvas[0].getContext('2d');
+                context.strokeStyle = color;
+                context.fillStyle = color;
+                context.lineWidth=4;
+
+                // create a drawer which tracks touch movements
+                var drawer = {
+                    isDrawing: false, isClearing: false,
+                    touchstart: function(coors){
+                        context.beginPath();
+                        context.moveTo(coors.x, coors.y);
+                        this.isDrawing = true;
+                        client.publish('/#{sessionId}/action', {
+                            command:"draw",
+                            cmd:"mousedown",
+                            x:coors.x,
+                            y:coors.y,
+                            page:index
+                        });
+                    },
+                    mousedown: function(coors){
+                        var localoffsetX=canvas.offset().left;
+                        var localoffsetY=canvas.offset().top;
+                        var localx =Math.floor(coors.x-localoffsetX);
+                        var localy =Math.floor(coors.y-localoffsetY);
+                        console.log('mousedown-local ' + localx +
+                         "; " + localy);
+                        context.beginPath();
+                        context.moveTo(localx, localy);
+                        this.isDrawing = true;
+                        client.publish('/#{sessionId}/action', {
+                            command:"draw",
+                            cmd:"mousedown",
+                            x:localx,
+                            y:localy,
+                            page:index
+                        });
+                    },
+                    touchmove: function(coors){
+                        if (this.isDrawing && !this.isClearing) {
+                            context.lineTo(coors.x, coors.y);
+                            context.stroke();
+                            client.publish('/#{sessionId}/action', {
+                                command:"draw",
+                                cmd:"mousemove",
+                                x:coors.x,
+                                y:coors.y,
+                                page:index,
+                                color:context.strokeStyle
+                            });
+                        }
+                    },
+                    mousemove: function(coors){
+                        if (this.isDrawing && !this.isClearing) {
+                            var localoffsetX = canvas.offset().left;
+                            var localoffsetY = canvas.offset().top;
+                            var localx = Math.floor(coors.x-localoffsetX);
+                            var localy = Math.floor(coors.y-localoffsetY);
+                            console.log('mousedown-local ' + localx +
+                                "; " + localy);
+                            context.lineTo(localx, localy);
+                            context.stroke();
+                            client.publish('/#{sessionId}/action', {
+                                command:"draw",
+                                cmd:"mousemove",
+                                x:localx,
+                                y:localy,
+                                page:index,
+                                color:context.strokeStyle
+                            });
+                        }
+                    },
+                    touchend: function(coors){
+                        if (this.isDrawing) {
+                            this.touchmove(coors);
+                            this.isDrawing = false;
+                            client.publish('/#{sessionId}/action', {
+                                command:"draw",
+                                cmd:"mouseup",
+                            });
+                        }
+                    },
+                    mouseup: function(coors){
+                        if (this.isDrawing) {
+                            this.touchmove(coors);
+                            this.isDrawing = false;
+                            client.publish('/#{sessionId}/action', {
+                                command:"draw",
+                                cmd:"mouseup",
+                            });
+                        }
+                    },
+                    gesturestart: function() {
+                        if(role == 'teacher')
+                            this.isClearing = true;
+                    },
+                    gestureend: function() {
+                        if(role == 'teacher') {
+                            context.clearRect(0,0,canvas.width,canvas.height);
+                            client.publish('/#{sessionId}/action', {
+                                command:"draw",
+                                cmd:"clear"
+                            });
+                            this.isClearing = false;
+                        }
+                    }
+                }; // drawer
+        
+                // create a function to pass touch events and coordinates to drawer
+                function draw(event){
+                    // get the touch coordinates
+                    var coors;
+                    if(event.targetTouches) 
+                        coors = {
+                            x: event.targetTouches[0].pageX,
+                            y: event.targetTouches[0].pageY
+                        };
+                    else {
+
+                        coors = {
+                            x: event.pageX,
+                            y: event.pageY
+                        };
+                    }
+                    // pass the coordinates to the appropriate handler
+                    drawer[event.type](coors);
+                }
+                
+                // attach the touchstart, touchmove, touchend event listeners.
+                canvas[0].addEventListener('touchstart',draw, false);
+                canvas[0].addEventListener('touchmove',draw, false);
+                canvas[0].addEventListener('touchend',draw, false);
+                canvas[0].addEventListener('mousedown',draw, false);
+                canvas[0].addEventListener('mousemove',draw, false);
+                canvas[0].addEventListener('mouseup',draw, false);
+                canvas[0].addEventListener('gesturestart',draw, false);
+                canvas[0].addEventListener('gestureend',draw, false);    
+            });
+        } //End of load score           
+        
+        
         function measureClick(element, id) {
           mpager.highlightMeasure(element, id);
-
         }        
       });
     script
@@ -114,3 +302,8 @@ html
     #overlay
       #overlay-content
         p Please wait...
+    #panel.panel
+        p bla blalbla
+        p blalbldsf
+        p csfsdfsfsdfsdf
+    a(class='trigger', href='#') Settings

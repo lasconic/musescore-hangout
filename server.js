@@ -10,7 +10,7 @@ var express = require('express')
   , faye = require('faye')
   , tools = require('./tools');
 
-var hostname = 'musescore.no.de';
+var hostname;
 var bayeux = new faye.NodeAdapter({mount: '/faye', timeout: 45});
 
 // Web Server, Express ------------------------------------------
@@ -35,7 +35,7 @@ app.configure(function(){
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-  hostname = 'localhost'; 
+  hostname = '84.88.38.223'; 
 });
 
 app.configure('production', function(){
@@ -65,8 +65,12 @@ app.post('/create', function(req, res) {
            				redisClient.incr( 'next.session.id' , function (err, id) {
            					var sessionId = tools.randomString(5) + id;
            					redisClient.set('session:'+sessionId, JSON.stringify(scoreSave), function() {
-           						var msg = 'You can go to your <a href="/session/' + sessionId + '">sheet music session</a>';
-           						res.send(msg);
+           						//var msg = 'You can go to your <a href="/session/' + sessionId + '">sheet music session</a>';
+           						//res.send(msg);
+           						res.writeHead(302, {
+								  'Location': '/session/' + sessionId
+								});
+								res.end();
            					});	
            				});	
       				});

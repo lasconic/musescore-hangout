@@ -62,7 +62,7 @@ html
           }
           else if (message.command == "draw") {
             var cmd = message.cmd; 
-            if(message.clientId != client.getClientId())
+            if(message.clientId != client.getClientId()) {
                 switch ( cmd ) {
                     case "mousedown":
                         var page = message.page;

@@ -12,6 +12,9 @@ html
 
       $(document).ready(function() {
         $("#overlay").hide();
+        $(".panel").toggle("fast");
+        $(".trigger").toggleClass("active");
+        
         var delay = #{delay};
         if(delay > 0) {
           $("#overlay").toggle();

@@ -79,18 +79,19 @@ div.measure-visible{
 .panel {
     z-index:9990;
     position: fixed;
-    top: 50px;
-    left: 0;
+    top: 20px;
+    right: 0;
     display: none;
     background: #000000;
     border:1px solid #111111;
-    -moz-border-radius-topright: 20px;
-    -webkit-border-top-right-radius: 20px;
-    -moz-border-radius-bottomright: 20px;
-    -webkit-border-bottom-right-radius: 20px;
-    width: 330px;
+    -moz-border-radius-topleft: 20px;
+    -webkit-border-top-left-radius: 20px;
+    -moz-border-radius-bottomleft: 20px;
+    -webkit-border-bottom-left-radius: 20px;
+
+    width: 200px;
     height: auto;
-    padding: 30px 30px 30px 130px;
+    padding: 30px 100px 0px 30px;
     filter: alpha(opacity=85);
     opacity: .85;
 }
@@ -121,45 +122,56 @@ a.trigger{
     z-index:9999;
     position: fixed;
     text-decoration: none;
-    top: 80px; left: 0;
-    font-size: 16px;
+    top: 20px; right: 0;
+    font-size: 12px;
     letter-spacing:-1px;
     font-family: verdana, helvetica, arial, sans-serif;
     color:#fff;
-    padding: 20px 40px 20px 15px;
+    padding: 10px 30px 10px 5px;
     font-weight: 700;
     background:#333333 url(../images/plus.png) 85% 55% no-repeat;
     border:1px solid #444444;
-    -moz-border-radius-topright: 20px;
-    -webkit-border-top-right-radius: 20px;
-    -moz-border-radius-bottomright: 20px;
-    -webkit-border-bottom-right-radius: 20px;
-    -moz-border-radius-bottomleft: 0px;
-    -webkit-border-bottom-left-radius: 0px;
+    -moz-border-radius-topleft: 20px;
+    -webkit-border-top-left-radius: 20px;
+    -moz-border-radius-bottomleft: 20px;
+    -webkit-border-bottom-left-radius: 20px;
+    -moz-border-radius-bottomright: 0px;
+    -webkit-border-bottom-right-radius: 0px;
     display: block;
 }
 
 a.trigger:hover{
     position: fixed;
     text-decoration: none;
-    top: 80px; left: 0;
-    font-size: 16px;
+    top: 20px; right: 0;
+    font-size: 12px;
     letter-spacing:-1px;
     font-family: verdana, helvetica, arial, sans-serif;
     color:#fff;
-    padding: 20px 40px 20px 20px;
+    padding: 10px 30px 10px 5px;
     font-weight: 700;
     background:#222222 url(../images/plus.png) 85% 55% no-repeat;
     border:1px solid #444444;
-    -moz-border-radius-topright: 20px;
-    -webkit-border-top-right-radius: 20px;
-    -moz-border-radius-bottomright: 20px;
-    -webkit-border-bottom-right-radius: 20px;
-    -moz-border-radius-bottomleft: 0px;
-    -webkit-border-bottom-left-radius: 0px;
+    -moz-border-radius-topleft: 20px;
+    -webkit-border-top-left-radius: 20px;
+    -moz-border-radius-bottomleft: 20px;
+    -webkit-border-bottom-left-radius: 20px;
+    -moz-border-radius-bottomright: 0px;
+    -webkit-border-bottom-right-radius: 0px;
     display: block;
 }
 
 a.active.trigger {
     background:#222222 url(../images/minus.png) 85% 55% no-repeat;
+}
+
+#powered {
+font-size: 12px;
+margin-top: 5px;
+}
+
+#search-score {
+padding-left: 5px;
+text-decoration: none;
+border-bottom: 0px;
 }

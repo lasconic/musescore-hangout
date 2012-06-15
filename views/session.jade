@@ -35,7 +35,6 @@ html
                     $(".loadscore").click(function() {
                       var targetUrl = "http://musescore.com/node/" + $(this).attr("data-scoreid");
                       var url = "http://#{hostname}/session/#{sessionId}/loadscore?url=" + encodeURIComponent(targetUrl);
-                      console.log(url);
                       $.get(url);
                       return false;
                     });
@@ -190,8 +189,6 @@ html
                         var localoffsetY=canvas.offset().top;
                         var localx =Math.floor(coors.x-localoffsetX);
                         var localy =Math.floor(coors.y-localoffsetY);
-                        console.log('mousedown-local ' + localx +
-                         "; " + localy);
                         context.beginPath();
                         context.moveTo(localx, localy);
                         this.isDrawing = true;
@@ -223,8 +220,6 @@ html
                             var localoffsetY = canvas.offset().top;
                             var localx = Math.floor(coors.x-localoffsetX);
                             var localy = Math.floor(coors.y-localoffsetY);
-                            console.log('mousedown-local ' + localx +
-                                "; " + localy);
                             context.lineTo(localx, localy);
                             context.stroke();
                             client.publish('/#{sessionId}/action', {

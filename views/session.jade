@@ -62,34 +62,36 @@ html
           }
           else if (message.command == "draw") {
             var cmd = message.cmd; 
-            switch ( cmd ) {
-                case "mousedown":
-                    var page = message.page;
-                    var canvas = $('#canvas-' + page);
-                    var context = canvas[0].getContext('2d');
-                    context.beginPath();
-                    context.moveTo(message.x, message.y);
-                    break;
-                case "mousemove":
-                    var page = message.page;
-                    var canvas = $('#canvas-' + page);
-                    var context = canvas[0].getContext('2d');
-                    var tmpColor = context.strokeStyle;
-                    var color = message.color;
-                    context.strokeStyle = color;
-                    context.lineTo(message.x, message.y);
-                    context.stroke();
-                    context.strokeStyle = tmpColor;
-                    break;
-                case "mouseup":    
-                    break;
-                case "clear":
-                    $('.canvas').each(function(index) {
-                        var canvas = $(this);
+            if(message.clientId != client.getClientId())
+                switch ( cmd ) {
+                    case "mousedown":
+                        var page = message.page;
+                        var canvas = $('#canvas-' + page);
                         var context = canvas[0].getContext('2d');
-                        context.clearRect(0,0,canvas.width,canvas.height);
-                    });
-                    break;
+                        context.beginPath();
+                        context.moveTo(message.x, message.y);
+                        break;
+                    case "mousemove":
+                        var page = message.page;
+                        var canvas = $('#canvas-' + page);
+                        var context = canvas[0].getContext('2d');
+                        var tmpColor = context.strokeStyle;
+                        var color = message.color;
+                        context.strokeStyle = color;
+                        context.lineTo(message.x, message.y);
+                        context.stroke();
+                        context.strokeStyle = tmpColor;
+                        break;
+                    case "mouseup":    
+                        break;
+                    case "clear":
+                        $('.canvas').each(function(index) {
+                            var canvas = $(this);
+                            var context = canvas[0].getContext('2d');
+                            context.clearRect(0,0,canvas.width,canvas.height);
+                        });
+                        break;
+                }
             }
           }
         });
@@ -173,15 +175,16 @@ html
                 var drawer = {
                     isDrawing: false, isClearing: false,
                     touchstart: function(coors){
-                        //context.beginPath();
-                        //context.moveTo(coors.x, coors.y);
+                        context.beginPath();
+                        context.moveTo(coors.x, coors.y);
                         this.isDrawing = true;
                         client.publish('/#{sessionId}/action', {
                             command:"draw",
                             cmd:"mousedown",
                             x:coors.x,
                             y:coors.y,
-                            page:index
+                            page:index,
+                            clientId:client.getClientId()
                         });
                     },
                     mousedown: function(coors){
@@ -189,28 +192,30 @@ html
                         var localoffsetY=canvas.offset().top;
                         var localx =Math.floor(coors.x-localoffsetX);
                         var localy =Math.floor(coors.y-localoffsetY);
-                        //context.beginPath();
-                        //context.moveTo(localx, localy);
+                        context.beginPath();
+                        context.moveTo(localx, localy);
                         this.isDrawing = true;
                         client.publish('/#{sessionId}/action', {
                             command:"draw",
                             cmd:"mousedown",
                             x:localx,
                             y:localy,
-                            page:index
+                            page:index,
+                            clientId:client.getClientId()
                         });
                     },
                     touchmove: function(coors){
                         if (this.isDrawing && !this.isClearing) {
-                            //context.lineTo(coors.x, coors.y);
-                            //context.stroke();
+                            context.lineTo(coors.x, coors.y);
+                            context.stroke();
                             client.publish('/#{sessionId}/action', {
                                 command:"draw",
                                 cmd:"mousemove",
                                 x:coors.x,
                                 y:coors.y,
                                 page:index,
-                                color:context.strokeStyle
+                                color:context.strokeStyle,
+                                clientId:client.getClientId()
                             });
                         }
                     },
@@ -220,15 +225,16 @@ html
                             var localoffsetY = canvas.offset().top;
                             var localx = Math.floor(coors.x-localoffsetX);
                             var localy = Math.floor(coors.y-localoffsetY);
-                            //context.lineTo(localx, localy);
-                            //context.stroke();
+                            context.lineTo(localx, localy);
+                            context.stroke();
                             client.publish('/#{sessionId}/action', {
                                 command:"draw",
                                 cmd:"mousemove",
                                 x:localx,
                                 y:localy,
                                 page:index,
-                                color:context.strokeStyle
+                                color:context.strokeStyle,
+                                clientId:client.getClientId()
                             });
                         }
                     },
@@ -239,6 +245,7 @@ html
                             client.publish('/#{sessionId}/action', {
                                 command:"draw",
                                 cmd:"mouseup",
+                                clientId:client.getClientId()
                             });
                         }
                     },
@@ -249,6 +256,7 @@ html
                             client.publish('/#{sessionId}/action', {
                                 command:"draw",
                                 cmd:"mouseup",
+                                clientId:client.getClientId()
                             });
                         }
                     },
@@ -261,7 +269,8 @@ html
                             context.clearRect(0,0,canvas.width,canvas.height);
                             client.publish('/#{sessionId}/action', {
                                 command:"draw",
-                                cmd:"clear"
+                                cmd:"clear",
+                                clientId:client.getClientId()
                             });
                             this.isClearing = false;
                         }

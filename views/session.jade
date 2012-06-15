@@ -173,8 +173,8 @@ html
                 var drawer = {
                     isDrawing: false, isClearing: false,
                     touchstart: function(coors){
-                        context.beginPath();
-                        context.moveTo(coors.x, coors.y);
+                        //context.beginPath();
+                        //context.moveTo(coors.x, coors.y);
                         this.isDrawing = true;
                         client.publish('/#{sessionId}/action', {
                             command:"draw",
@@ -189,8 +189,8 @@ html
                         var localoffsetY=canvas.offset().top;
                         var localx =Math.floor(coors.x-localoffsetX);
                         var localy =Math.floor(coors.y-localoffsetY);
-                        context.beginPath();
-                        context.moveTo(localx, localy);
+                        //context.beginPath();
+                        //context.moveTo(localx, localy);
                         this.isDrawing = true;
                         client.publish('/#{sessionId}/action', {
                             command:"draw",
@@ -202,8 +202,8 @@ html
                     },
                     touchmove: function(coors){
                         if (this.isDrawing && !this.isClearing) {
-                            context.lineTo(coors.x, coors.y);
-                            context.stroke();
+                            //context.lineTo(coors.x, coors.y);
+                            //context.stroke();
                             client.publish('/#{sessionId}/action', {
                                 command:"draw",
                                 cmd:"mousemove",
@@ -220,8 +220,8 @@ html
                             var localoffsetY = canvas.offset().top;
                             var localx = Math.floor(coors.x-localoffsetX);
                             var localy = Math.floor(coors.y-localoffsetY);
-                            context.lineTo(localx, localy);
-                            context.stroke();
+                            //context.lineTo(localx, localy);
+                            //context.stroke();
                             client.publish('/#{sessionId}/action', {
                                 command:"draw",
                                 cmd:"mousemove",

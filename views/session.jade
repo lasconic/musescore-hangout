@@ -164,7 +164,7 @@ html
             $('.canvas').each(function(index) {
                 var canvas = $(this);
                 var role = 'teacher';
-                var color = "rgba(255,255,0,0.1)";
+                var color = Math.floor(Math.random()*16777215).toString(16);
                 // get the canvas element and its context
                 var context = canvas[0].getContext('2d');
                 context.strokeStyle = color;

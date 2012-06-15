@@ -77,6 +77,7 @@ div.measure-visible{
 }
 
 .panel {
+    z-index:9990;
     position: fixed;
     top: 50px;
     left: 0;

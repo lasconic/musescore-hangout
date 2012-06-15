@@ -24,6 +24,29 @@ html
             return false;
         });
         
+        $("#search-score").click(function(){
+            $.getJSON('http://api.musescore.com/services/rest/score.jsonp?oauth_consumer_key=musichackday&callback=?&text=' + $('#input-score').val(),
+            function(data) {
+                $('#musescore-result').html('');
+                if(data && data.length > 0) {
+                    $.each(data, function(key, value) {
+                        $('#musescore-result').append('<a class="loadscore" href="#" data-scoreid="'+value.id+'">'+value.title+'</a><br/>');
+                    });
+                    $(".loadscore").click(function() {
+                      var targetUrl = "http://musescore.com/node/" + $(this).attr("data-scoreid");
+                      var url = "http://#{hostname}/session/#{sessionId}/loadscore?url=" + encodeURIComponent(targetUrl);
+                      console.log(url);
+                      $.get(url);
+                      return false;
+                    });
+                } 
+                else {
+                    $('#musescore-result').append('<p>No result</p>');
+                }
+            } );
+            return false;
+        });
+                
         var client = new Faye.Client('http://#{hostname}/faye');
         var subscription = client.subscribe('/#{sessionId}/action', function(message) {
           if (message.command == "gotomeasure") {
@@ -78,7 +101,8 @@ html
           console.log(error.message);
         });
         
-        loadScoreById('#{id}');
+        if(#{id} != -1)
+            loadScoreById('#{id}');
         
         function loadScoreById(id){
             $.ajax({
@@ -303,7 +327,14 @@ html
       #overlay-content
         p Please wait...
     #panel.panel
-        p bla blalbla
-        p blalbldsf
-        p csfsdfsfsdfsdf
+        #search-score-block
+            p Search score 
+                input#input-score
+                a(id='search-score', href='#') Search
+            #musescore-result
+        #search-audio-block
+            p Search audio
+                input#input-audio
+                a(id='search-audio', href='#') Search
+            div#audio-result
     a(class='trigger', href='#') Settings

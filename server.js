@@ -35,7 +35,7 @@ app.configure(function(){
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-  hostname = '84.88.38.223'; 
+  hostname = 'localhost'; 
 });
 
 app.configure('production', function(){
@@ -114,43 +114,74 @@ var scorePage = function(sessionId, template, req, res) {
     var delay = req.param("delay", 0);
     console.log("delay " + delay);
     redisClient.get('session:'+sessionId, function(err, data){
+    	console.log(err + ';' + data);
 		if(!data) {
-			res.writeHead(404);
-			res.write('No session found.');
-			res.end();
-			return;
-		}
-		var score = JSON.parse(data);
-		
-		var options = {  
-	           host: 'api.musescore.com',   
-	           port: 80,   
-	           path: '/services/rest/score/'+score.id+'.json?&oauth_consumer_key=musichackday'  
-	    };
-      	http.get(options, function(resp) {
-      		if(resp.statusCode == 200) {
-      		    var data = '';
-      			resp.on('data', function(chunk) {   
-      				data += chunk;
-     				}).on('error', function(e) {  
-      			  console.log("Got error: " + e.message);   
- 				});
-   				resp.on('end', function() {
-   				    var scoreData = JSON.parse(data); 
-        			console.log(scoreData.id + ' - ' + scoreData.secret + ' - ' + scoreData.metadata.pages);
-        			res.render(template, {title:scoreData.title, 
-						id:scoreData.id, 
-						secret:scoreData.secret, 
-						pageCount: scoreData.metadata.pages,
+			//res.writeHead(404);
+			//res.write('No session found.');
+			//res.end();
+			//return;
+			console.log('lets create it');
+			var scoreSave = {id:-1, secret : '', pageCount:''};
+			redisClient.set('session:'+sessionId, JSON.stringify(scoreSave), function() {
+				console.log('set !');
+				res.render("session.jade", {title:'', 
+						id:-1, 
+						secret:'', 
+						pageCount: '',
 						sessionId: sessionId, 
-						layout:false,
+						layout:'',
 						hostname:hostname,
-						scoreChanged: scoreData.dates.lastupdate,
-						delay:delay
-					}); // res.render			
-   				}); //resp.on
-      		}//if 200
-      	}); //http.get 
+						scoreChanged: '',
+						delay:0
+					});
+				//res.end();
+				return;
+			});
+		} else {
+			var score = JSON.parse(data);
+			if(score.id == -1) {
+				res.render("session.jade", {title:'', 
+						id:-1, 
+						secret:'', 
+						pageCount: '',
+						sessionId: sessionId, 
+						layout:'',
+						hostname:hostname,
+						scoreChanged: '',
+						delay:0
+					});
+				return;
+			}
+			var options = {  
+				   host: 'api.musescore.com',   
+				   port: 80,   
+				   path: '/services/rest/score/'+score.id+'.json?&oauth_consumer_key=musichackday'  
+			};
+			http.get(options, function(resp) {
+				if(resp.statusCode == 200) {
+					var data = '';
+					resp.on('data', function(chunk) {   
+						data += chunk;
+						}).on('error', function(e) {  
+					  console.log("Got error: " + e.message);   
+					});
+					resp.on('end', function() {
+						var scoreData = JSON.parse(data); 
+						console.log(scoreData.id + ' - ' + scoreData.secret + ' - ' + scoreData.metadata.pages);
+						res.render(template, {title:scoreData.title, 
+							id:scoreData.id, 
+							secret:scoreData.secret, 
+							pageCount: scoreData.metadata.pages,
+							sessionId: sessionId, 
+							layout:false,
+							hostname:hostname,
+							scoreChanged: scoreData.dates.lastupdate,
+							delay:delay
+						}); // res.render			
+					}); //resp.on
+				}//if 200
+			}); //http.get
+		} // !data
 	}); //redisClient.get
 }
 
